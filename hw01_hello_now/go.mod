@@ -1,4 +1,4 @@
-module github.com/alexch365/otus-homeworks/hw01_hello_now
+module github.com/alexch365/otus-golang-hw/hw01_hello_now
 
 go 1.14
 
