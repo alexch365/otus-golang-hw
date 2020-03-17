@@ -9,34 +9,47 @@ import (
 
 var ErrInvalidString = errors.New("invalid string")
 
-func Unpack(inputString string) (string, error) {
-	inputString = strings.TrimSpace(inputString)
+func Unpack(str string) (string, error) {
+	if len(str) == 0 {
+		return "", nil
+	}
+
 	var builder strings.Builder
+	var bufRune rune
 	var escapeMode bool
 
-	for i := 0; i < len(inputString); i++ {
-		lastChar := i == len(inputString)-1 //nolint:gomnd
+	for _, currentRune := range str {
+		runeIsDigit := unicode.IsDigit(currentRune)
+		runeIsSlash := currentRune == '\\'
 
-		if string(inputString[i]) == `\` && !escapeMode {
-			escapeMode = true
-			if lastChar {
-				return "", ErrInvalidString
+		if bufRune != 0 {
+			if runeIsDigit {
+				counter, _ := strconv.Atoi(string(currentRune))
+				builder.WriteString(strings.Repeat(string(bufRune), counter))
+				bufRune = 0
+				escapeMode = false
+				continue
+			} else {
+				builder.WriteRune(bufRune)
 			}
+		}
+		// first slash occurrence
+		if !escapeMode && runeIsSlash {
+			bufRune = 0
+			escapeMode = true
 			continue
 		}
-
-		if !escapeMode && !unicode.IsLetter(rune(inputString[i])) {
+		// second slash occurrence or digit after slash or "not a digit" without slash
+		if escapeMode && (runeIsDigit || runeIsSlash) || !escapeMode && !runeIsDigit {
+			bufRune = currentRune
+			escapeMode = false
+		} else {
 			return "", ErrInvalidString
 		}
-
-		if !lastChar && unicode.IsDigit(rune(inputString[i+1])) {
-			counter, _ := strconv.Atoi(string(inputString[i+1]))
-			builder.WriteString(strings.Repeat(string(inputString[i]), counter))
-			i++
-		} else {
-			builder.WriteString(string(inputString[i]))
-		}
-		escapeMode = false
+	}
+	// If we have a rune without a counter at the end of the string
+	if bufRune != 0 {
+		builder.WriteRune(bufRune)
 	}
 	return builder.String(), nil
 }

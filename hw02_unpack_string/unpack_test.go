@@ -19,21 +19,13 @@ func TestUnpack(t *testing.T) {
 			expected: "aaaabccddddde",
 		},
 		{
-			input:    "abccd",
-			expected: "abccd",
+			input:    "abcd",
+			expected: "abcd",
 		},
 		{
 			input:    "3abc",
 			expected: "",
 			err:      ErrInvalidString,
-		},
-		{
-			input:    "A1b4cd",
-			expected: "Abbbbcd",
-		},
-		{
-			input:    "aa0a3b2",
-			expected: "aaaabb",
 		},
 		{
 			input:    "45",
@@ -48,6 +40,14 @@ func TestUnpack(t *testing.T) {
 		{
 			input:    "",
 			expected: "",
+		},
+		{
+			input:    "d\n5abc",
+			expected: "d\n\n\n\n\nabc",
+		},
+		{
+			input:    " Аб 3в4гd",
+			expected: " Аб   ввввгd",
 		},
 	} {
 		result, err := Unpack(tst.input)
@@ -67,33 +67,24 @@ func TestUnpackWithEscape(t *testing.T) {
 			expected: `qwe44444`,
 		},
 		{
-			input:    `qwe\\5`,
-			expected: `qwe\\\\\`,
+			input:    `qwe\\5a`,
+			expected: `qwe\\\\\a`,
 		},
 		{
 			input:    `qwe\\\3`,
 			expected: `qwe\3`,
 		},
 		{
-			input:    `qwe\45\`,
+			input:    "qwe\\2\r\n3\\",
+			expected: "qwe2\r\n\n\n",
+		},
+		{
+			input:    `qw\n5e`,
 			expected: "",
 			err:      ErrInvalidString,
 		},
-	} {
-		result, err := Unpack(tst.input)
-		require.Equal(t, tst.err, err)
-		require.Equal(t, tst.expected, result)
-	}
-}
-
-func TestUnpackWithSpaces(t *testing.T) {
-	for _, tst := range [...]test{
 		{
-			input:    "  \t\n qwe4a5  \n\r",
-			expected: "qweeeeaaaaa",
-		},
-		{
-			input:    `  qwe   \45`,
+			input:    "qw\\\n5e",
 			expected: "",
 			err:      ErrInvalidString,
 		},
