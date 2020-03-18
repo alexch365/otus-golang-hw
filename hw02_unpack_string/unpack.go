@@ -40,7 +40,7 @@ func Unpack(str string) (string, error) {
 			continue
 		}
 		// second slash occurrence or digit after slash or "not a digit" without slash
-		if escapeMode && (runeIsDigit || runeIsSlash) || !escapeMode && !runeIsDigit {
+		if escapeMode && (runeIsDigit || runeIsSlash) || (!escapeMode && !runeIsDigit) {
 			bufRune = currentRune
 			escapeMode = false
 		} else {
