@@ -6,7 +6,7 @@ import (
 )
 
 func Top10(str string) []string {
-	var topWords []string
+	topWords := []string{}
 	if str == "" {
 		return topWords
 	}
@@ -24,7 +24,7 @@ func Top10(str string) []string {
 		Word      string
 		Frequency int
 	}
-	var wordFrequencies []wf
+	wordFrequencies := []wf{}
 	for word, count := range wordCount {
 		wordFrequencies = append(wordFrequencies, wf{word, count})
 	}
