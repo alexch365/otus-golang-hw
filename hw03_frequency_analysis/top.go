@@ -6,9 +6,8 @@ import (
 )
 
 func Top10(str string) []string {
-	topWords := []string{}
 	if str == "" {
-		return topWords
+		return []string{}
 	}
 
 	wordCount := map[string]int{}
@@ -24,7 +23,7 @@ func Top10(str string) []string {
 		Word      string
 		Frequency int
 	}
-	wordFrequencies := []wf{}
+	wordFrequencies := make([]wf, 0, len(wordCount))
 	for word, count := range wordCount {
 		wordFrequencies = append(wordFrequencies, wf{word, count})
 	}
@@ -32,6 +31,7 @@ func Top10(str string) []string {
 		return wordFrequencies[i].Frequency > wordFrequencies[j].Frequency
 	})
 
+	topWords := make([]string, 0, 10)
 	for _, freq := range wordFrequencies[:10] {
 		topWords = append(topWords, freq.Word)
 	}
