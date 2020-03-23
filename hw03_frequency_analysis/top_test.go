@@ -7,7 +7,7 @@ import (
 )
 
 // Change to true if needed
-var taskWithAsteriskIsCompleted = false
+var taskWithAsteriskIsCompleted = true
 
 var text = `Как видите, он  спускается  по  лестнице  вслед  за  своим
 	другом   Кристофером   Робином,   головой   вниз,  пересчитывая
@@ -43,6 +43,26 @@ var text = `Как видите, он  спускается  по  лестни�
 	посидеть у огня и послушать какую-нибудь интересную сказку.
 		В этот вечер...`
 
+var quote = `“Our opportunities to give of ourselves are indeed limitless, but they are also perishable.
+	There are hearts to gladden. There are kind words to say. There are gifts to be given. There are deeds to be done.
+	There are souls to be saved. As we remember that “when ye are in the service of your fellow beings ye are only
+	in the service of your God,” (Mosiah 2:17) we will not find ourselves in the unenviable position of Jacob Marley’s
+	ghost, who spoke to Ebenezer Scrooge in Charles Dickens’s immortal "Christmas Carol." Marley spoke sadly
+	of opportunities lost. Said he: 'Not to know that any Christian spirit working kindly in its little sphere,
+	whatever it may be, will find its mortal life too short for its vast means of usefulness. Not to know that no
+	space of regret can make amends for one life’s opportunity misused! Yet such was I! Oh! such was I!
+	'Marley added: 'Why did I walk through crowds of fellow-beings with my eyes turned down, and never raise them
+	to that blessed Star which led the Wise Men to a poor abode? Were there no poor homes to which its light would
+	have conducted me!'Fortunately, as we know, Ebenezer Scrooge changed his life for the better.
+	I love his line, 'I am not the man I was.'Why is Dickens’ "Christmas Carol" so popular? Why is it ever new?
+	I personally feel it is inspired of God. It brings out the best within human nature. It gives hope.
+	It motivates change. We can turn from the paths which would lead us down and, with a song in our hearts,
+	follow a star and walk toward the light. We can quicken our step, bolster our courage, and bask in the
+	sunlight of truth. We can hear more clearly the laughter of little children. We can dry the tear of the weeping.
+	We can comfort the dying by sharing the promise of eternal life. If we lift one weary hand which hangs down,
+	if we bring peace to one struggling soul, if we give as did the Master, we can —by showing the way— become
+	a guiding star for some lost mariner.” - Thomas S. Monson`
+
 func TestTop10(t *testing.T) {
 	t.Run("no words in empty string", func(t *testing.T) {
 		assert.Len(t, Top10(""), 0)
@@ -55,6 +75,14 @@ func TestTop10(t *testing.T) {
 		} else {
 			expected := []string{"он", "и", "а", "что", "ты", "не", "если", "-", "то", "Кристофер"}
 			assert.ElementsMatch(t, expected, Top10(text))
+		}
+	})
+
+	t.Run("latin positive test", func(t *testing.T) {
+		if taskWithAsteriskIsCompleted {
+			assert.Contains(t, Top10(quote), "i")
+		} else {
+			assert.NotContains(t, Top10(quote), "i")
 		}
 	})
 }
