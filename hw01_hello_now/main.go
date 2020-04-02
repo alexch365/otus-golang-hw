@@ -14,7 +14,7 @@ func main() {
 
 	if err != nil {
 		log.Fatalln("exact time:", err)
-	} else {
-		fmt.Println("exact time:", exactTime)
 	}
+
+	fmt.Println("exact time:", exactTime)
 }

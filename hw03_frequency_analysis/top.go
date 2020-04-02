@@ -12,8 +12,9 @@ func Top10(str string) []string {
 
 	wordCount := map[string]int{}
 	words := regexp.MustCompile(`\s`).Split(str, -1)
+	regexpCompiled := regexp.MustCompile(`(^['"“\-]|['"”!,.:;\-]+?$)`)
 	for _, word := range words {
-		word = regexp.MustCompile(`(^['"“\-]|['"”!,.:;\-]+?$)`).ReplaceAllString(word, "")
+		word = regexpCompiled.ReplaceAllString(word, "")
 		if word != "" {
 			wordCount[strings.ToLower(word)]++
 		}
