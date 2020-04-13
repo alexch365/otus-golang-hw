@@ -1,5 +1,4 @@
 package hw04_lru_cache //nolint:golint,stylecheck
-
 import (
 	"math/rand"
 	"strconv"
@@ -50,13 +49,48 @@ func TestCache(t *testing.T) {
 	})
 
 	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+		c := NewCache(2)
+
+		c.Set("Not Found", 404)
+		c.Set("OK", 200)
+		c.Clear()
+		c.Set("No Content", 204)
+
+		val, ok := c.Get("Not Found")
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		val, ok = c.Get("OK")
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		val, ok = c.Get("No Content")
+		require.True(t, ok)
+		require.Equal(t, val, 204)
+	})
+
+	t.Run("pushing out rarely used items", func(t *testing.T) {
+		capacity := 100
+		c := NewCache(capacity)
+
+		for i := 0; i < 1_000; i++ {
+			c.Set(Key(strconv.Itoa(i)), i)
+			if i > capacity-1 {
+				val, ok := c.Get(Key(strconv.Itoa(i - capacity)))
+				require.False(t, ok)
+				require.Nil(t, val)
+			}
+		}
+
+		for i := 1_000 - capacity; i < 1_000; i++ {
+			val, ok := c.Get(Key(strconv.Itoa(i)))
+			require.True(t, ok)
+			require.Equal(t, val, i)
+		}
 	})
 }
 
 func TestCacheMultithreading(t *testing.T) {
-	t.Skip() // Remove if task with asterisk completed
-
 	c := NewCache(10)
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
