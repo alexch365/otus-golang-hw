@@ -23,6 +23,7 @@ type cacheItem struct {
 
 func (c *lruCache) Set(key Key, value interface{}) bool {
 	c.mux.Lock()
+	defer c.mux.Unlock()
 
 	v, found := c.items[key]
 	newItem := cacheItem{key, value}
@@ -38,7 +39,6 @@ func (c *lruCache) Set(key Key, value interface{}) bool {
 		c.queue.Remove(backQueueItem)
 		delete(c.items, backQueueItem.Value.(cacheItem).Key)
 	}
-	c.mux.Unlock()
 	return found
 }
 
@@ -46,8 +46,7 @@ func (c *lruCache) Get(key Key) (interface{}, bool) {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 
-	item, found := c.items[key]
-	if found {
+	if item, found := c.items[key]; found {
 		c.queue.MoveToFront(item)
 		return item.Value.(cacheItem).Value, true
 	}

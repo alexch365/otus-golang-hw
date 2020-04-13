@@ -28,14 +28,14 @@ func (l list) Len() int {
 
 func (l list) Front() *listItem {
 	if l.front == nil && l.len == 1 {
-		return l.back
+		l.front = l.back
 	}
 	return l.front
 }
 
 func (l list) Back() *listItem {
 	if l.back == nil && l.len == 1 {
-		return l.front
+		l.back = l.front
 	}
 	return l.back
 }
