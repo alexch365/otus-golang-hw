@@ -24,7 +24,11 @@ func worker(tasks <-chan Task, errors chan error) {
 
 // Run starts tasks in N goroutines and stops its work when receiving M errors from tasks
 func Run(tasks []Task, N int, M int) error { //nolint:gocritic
-	if M <= 0 {
+	if N <= 0 || len(tasks) == 0 {
+		return nil
+	}
+
+	if M <= 0 || M > len(tasks) {
 		SimpleRun(tasks, N)
 		return nil
 	}
@@ -36,8 +40,8 @@ func Run(tasks []Task, N int, M int) error { //nolint:gocritic
 	wg.Add(N)
 	for i := 0; i < N; i++ {
 		go func() {
+			defer wg.Done()
 			worker(tasksCh, errorsCh)
-			wg.Done()
 		}()
 	}
 
@@ -48,12 +52,11 @@ func Run(tasks []Task, N int, M int) error { //nolint:gocritic
 
 	wg.Wait()
 
-	select {
-	case errorsCh <- errors.New(""):
-		return nil
-	default:
+	close(errorsCh)
+	if len(errorsCh) == M {
 		return ErrErrorsLimitExceeded
 	}
+	return nil
 }
 
 func SimpleRun(tasks []Task, N int) { //nolint:gocritic
