@@ -2,6 +2,7 @@ package hw06_pipeline_execution //nolint:golint,stylecheck
 
 import (
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -89,5 +90,40 @@ func TestPipeline(t *testing.T) {
 
 		require.Len(t, result, 0)
 		require.Less(t, int64(elapsed), int64(abortDur)+int64(fault))
+	})
+
+	t.Run("empty stages case", func(t *testing.T) {
+		in := make(Bi)
+		data := []string{"There ", "are ", "no ", "stages"}
+		go func() {
+			for _, v := range data {
+				in <- v
+			}
+			close(in)
+		}()
+
+		var stages []Stage
+		var builder strings.Builder
+		for s := range ExecutePipeline(in, nil, stages...) {
+			builder.WriteString(s.(string))
+		}
+
+		require.Equal(t, builder.String(), "There are no stages")
+	})
+
+	t.Run("nil data case", func(t *testing.T) {
+		stages := []Stage{
+			g("ToInt", func(v I) I { return v.(int) }),
+			g("ToString", func(v I) I { return v.(string) }),
+		}
+
+		start := time.Now()
+		outStream := ExecutePipeline(nil, nil, stages...)
+		elapsed := time.Since(start)
+
+		require.Zero(t, len(outStream))
+		require.Less(t,
+			int64(elapsed),
+			int64(sleepPerStage)*int64(len(stages)-1)+int64(fault))
 	})
 }
