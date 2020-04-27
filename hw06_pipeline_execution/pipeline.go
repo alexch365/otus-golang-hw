@@ -10,12 +10,11 @@ type (
 type Stage func(in In) (out Out)
 
 func ExecutePipeline(in In, done In, stages ...Stage) Out {
-	outStream := make(Bi, len(in))
-
 	if len(stages) == 0 {
 		return in
 	}
 
+	outStream := make(Bi, len(in))
 	if in == nil {
 		close(outStream)
 		return outStream
@@ -36,11 +35,7 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 				if !ok {
 					return
 				}
-				select {
-				case <-done:
-					return
-				case outStream <- pipelineValue:
-				}
+				outStream <- pipelineValue
 			}
 		}
 	}()
